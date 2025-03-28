@@ -11,7 +11,6 @@ namespace xml280325
       string path = null;
       string keyword;
 
-
       Caretaker caretaker = new Caretaker();
       Originator originator = new Originator();
 

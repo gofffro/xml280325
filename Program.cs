@@ -33,7 +33,8 @@ namespace xml280325
 
         switch (menuChoice)
         {
-          case "0": return;
+          case "0": 
+            return;
 
           case "1":
             Console.Write("Директория: ");
@@ -73,14 +74,17 @@ namespace xml280325
             Console.WriteLine("Изменения сохранены");
             break;
 
-          case "4": 
+          case "4":
             if (caretaker.Memento != null && File.Exists(currentFilePath))
             {
               originator.SetMemento(caretaker.Memento);
               File.WriteAllText(currentFilePath, originator.State);
               Console.WriteLine("Откат выполнен");
             }
-            else Console.WriteLine("Нет состояния для отката");
+            else
+            {
+              Console.WriteLine("Нет состояния для отката");
+            }
             break;
 
           case "5":

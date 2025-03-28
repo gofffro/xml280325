@@ -8,5 +8,7 @@ namespace xml280325
 {
   public class Search
   {
+    public string DirectoryPath { get; set; }
+    public string Keyword { get; set; }
   }
 }

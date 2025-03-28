@@ -43,6 +43,7 @@ namespace xml280325
             Search search = new Search(keyword, path);
             search.Result();
             break;
+
           case "2":
             Console.WriteLine("Введите путь к файлу: ");
             path = Console.ReadLine();
@@ -56,6 +57,26 @@ namespace xml280325
             {
               Console.WriteLine("Файл не найден или путь не указан");
             }
+            break;
+
+          case "3":
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            {
+              Console.WriteLine("Сначала прочитайте файл (пункт 4)");
+              break;
+            }
+
+            string currentContent = File.ReadAllText(path);
+            originator.State = currentContent;
+            caretaker.Memento = originator.CreateMemento();
+
+            Console.WriteLine("Введите текст для записи: ");
+            string text = Console.ReadLine();
+            File.WriteAllText(path, currentContent + text + Environment.NewLine);
+            Console.WriteLine("Текст записан в файл");
+
+            originator.State = File.ReadAllText(path);
+            Console.WriteLine("Новое состояние файла сохранено");
             break;
         }
       }

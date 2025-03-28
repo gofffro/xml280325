@@ -10,5 +10,12 @@ namespace xml280325
   {
     public string DirectoryPath { get; set; }
     public string Keyword { get; set; }
+
+    public Search(string keyword, string directoryPath)
+    {
+      DirectoryPath = directoryPath;
+      Keyword = keyword;
+    }
+
   }
 }

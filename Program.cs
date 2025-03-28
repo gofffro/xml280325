@@ -43,6 +43,20 @@ namespace xml280325
             Search search = new Search(keyword, path);
             search.Result();
             break;
+          case "2":
+            Console.WriteLine("Введите путь к файлу: ");
+            path = Console.ReadLine();
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            {
+              string content = File.ReadAllText(path);
+              Console.WriteLine($"Текст из файла:\n{content}");
+              originator.State = content;
+            }
+            else
+            {
+              Console.WriteLine("Файл не найден или путь не указан");
+            }
+            break;
         }
       }
     }

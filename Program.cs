@@ -78,6 +78,24 @@ namespace xml280325
             originator.State = File.ReadAllText(path);
             Console.WriteLine("Новое состояние файла сохранено");
             break;
+
+          case "4":
+            if (caretaker.Memento != null && File.Exists(path))
+            {
+              originator.SetMemento(caretaker.Memento);
+              File.WriteAllText(path, originator.State);
+              Console.WriteLine("Откат изменений выполнен. Файл восстановлен");
+              originator.State = File.ReadAllText(path);
+            }
+            else
+            {
+              Console.WriteLine("Нет состояний для отката, файл не выбран или файл не существует");
+            }
+            break;
+
+          default:
+            Console.WriteLine("Введено некорректное значение");
+            break;
         }
       }
     }

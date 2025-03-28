@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace xml280325
 {
@@ -6,7 +7,13 @@ namespace xml280325
   {
     static void Main(string[] args)
     {
-      string choice;
+      string menuChoice;
+      string path = null;
+      string keyword;
+
+
+      Caretaker caretaker = new Caretaker();
+      Originator originator = new Originator();
 
       while (true)
       {
@@ -17,13 +24,25 @@ namespace xml280325
             "3) Записать в файл\n" +
             "4) Откат изменений\n" +
             "Ввод: ");
-        choice = Console.ReadLine();
+        menuChoice = Console.ReadLine();
         Console.Clear();
 
-        if (choice == "0")
+        if (menuChoice == "0")
         {
           Console.WriteLine("Программа завершила работу");
           break;
+        }
+
+        switch (menuChoice)
+        {
+          case "1":
+            Console.WriteLine("Введите директорию: ");
+            path = Console.ReadLine();
+            Console.WriteLine("Введите ключевое слово: ");
+            keyword = Console.ReadLine();
+            Search search = new Search(keyword, path);
+            search.Result();
+            break;
         }
       }
     }

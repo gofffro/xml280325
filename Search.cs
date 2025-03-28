@@ -69,26 +69,5 @@ namespace xml280325
         Console.WriteLine("Файлы, содержащие ключевое слово, не найдены");
       }
     }
-
-    public class Indexes
-    {
-      private readonly List<Search> _searches = new();
-
-      public void AddSearch(Search search)
-      {
-        _searches.Add(search);
-      }
-
-      public void PerformAllSearches()
-      {
-        Console.WriteLine("Выполнение всех сохраненных поисков:");
-
-        foreach (var search in _searches)
-        {
-          Console.WriteLine($"\nПоиск для ключевого слова '{search.Keyword}' в директории '{search.DirectoryPath}':");
-          search.Result();
-        }
-      }
-    }
   }
 }

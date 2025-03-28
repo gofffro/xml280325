@@ -17,5 +17,37 @@ namespace xml280325
       Keyword = keyword;
     }
 
+    public List<string> FindFilesWithKeyword()
+    {
+      List<string> resultFiles = new List<string>();
+
+      try
+      {
+        string[] allFiles = Directory.GetFiles(DirectoryPath, "*.*", SearchOption.AllDirectories);
+
+        foreach (string file in allFiles)
+        {
+          try
+          {
+            string fileContent = File.ReadAllText(file, Encoding.Default);
+
+            if (fileContent.IndexOf(Keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+              resultFiles.Add(file);
+            }
+          }
+          catch (Exception ex)
+          {
+            Console.WriteLine($"Ошибка при чтении файла {file}: {ex.Message}");
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Ошибка при поиске файлов в директории {DirectoryPath}: {ex.Message}");
+      }
+
+      return resultFiles;
+    }
   }
 }

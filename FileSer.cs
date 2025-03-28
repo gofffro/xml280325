@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
+using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace xml280325
 {
   [Serializable]
-   public class FileSer
+  public class FileSer
   {
     public string FileName { get; set; }
-    public string Content {  get; set; }
+    public string Content { get; set; }
 
     public FileSer() { }
 
@@ -29,18 +25,14 @@ namespace xml280325
       Console.WriteLine($"Контент: {Content}");
     }
 
-    public void SerializeBinary(FileStream fs)
+    public byte[] SerializeBinary()
     {
-      JsonSerializer.Serialize(fs, this);
-      fs.Flush();
-      fs.Close();
+      return JsonSerializer.SerializeToUtf8Bytes(this);
     }
 
-    public static FileSer DeserializeBinary(FileStream fs)
+    public static FileSer DeserializeBinary(byte[] data)
     {
-      FileSer deserialized = JsonSerializer.Deserialize<FileSer>(fs);
-      fs.Close();
-      return deserialized;
+      return JsonSerializer.Deserialize<FileSer>(data);
     }
 
     public void SerializeXML(FileStream fs)
@@ -48,15 +40,12 @@ namespace xml280325
       var serializer = new XmlSerializer(typeof(FileSer));
       serializer.Serialize(fs, this);
       fs.Flush();
-      fs.Close();
     }
 
     public static FileSer DeserializeXML(FileStream fs)
     {
       var serializer = new XmlSerializer(typeof(FileSer));
-      FileSer deserialized = (FileSer)serializer.Deserialize(fs);
-      fs.Close();
-      return deserialized;
+      return (FileSer)serializer.Deserialize(fs);
     }
   }
 }

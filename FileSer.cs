@@ -3,28 +3,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace xml280325
 {
+  [Serializable]
    public class FileSer
   {
-    public string Name { get; set; }
-    public string Surname { get; set; }
-    public int Age { get; set; }
+    public string FileName { get; set; }
+    public string Content {  get; set; }
 
     public FileSer() { }
 
-    public FileSer(string name, string surname, int age)
+    public FileSer(string filename, string content)
     {
-      Name = name;
-      Surname = surname;
-      Age = age;
+      FileName = filename;
+      Content = content;
     }
 
     public void Print()
     {
-      Console.WriteLine($"Name={Name} Surname={Surname} Age={Age}");
+      Console.WriteLine($"Имя файла: {FileName}");
+      Console.WriteLine($"Контент: {Content}");
+    }
+
+    public void SerializeBinary(FileStream fs)
+    {
+      JsonSerializer.Serialize(fs, this);
+      fs.Flush();
+      fs.Close();
+    }
+
+    public static FileSer DeserializeBinary(FileStream fs)
+    {
+      FileSer deserialized = JsonSerializer.Deserialize<FileSer>(fs);
+      fs.Close();
+      return deserialized;
+    }
+
+    public void SerializeXML(FileStream fs)
+    {
+      var serializer = new XmlSerializer(typeof(FileSer));
+      serializer.Serialize(fs, this);
+      fs.Flush();
+      fs.Close();
+    }
+
+    public static FileSer DeserializeXML(FileStream fs)
+    {
+      var serializer = new XmlSerializer(typeof(FileSer));
+      FileSer deserialized = (FileSer)serializer.Deserialize(fs);
+      fs.Close();
+      return deserialized;
     }
   }
 }

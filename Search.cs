@@ -49,5 +49,25 @@ namespace xml280325
 
       return resultFiles;
     }
+
+    public void Result()
+    {
+      Console.WriteLine($"Поиск файлов, содержащих ключевое слово '{Keyword}' в директории '{DirectoryPath}':");
+
+      List<string> foundFiles = FindFilesWithKeyword();
+
+      if (foundFiles.Count > 0)
+      {
+        Console.WriteLine("Найденные файлы:");
+        foreach (string file in foundFiles)
+        {
+          Console.WriteLine(file);
+        }
+      }
+      else
+      {
+        Console.WriteLine("Файлы, содержащие ключевое слово, не найдены");
+      }
+    }
   }
 }

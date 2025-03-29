@@ -10,8 +10,7 @@ namespace xml280325
       string menuChoice;
       string currentFilePath = null;
       Search search = null;
-      Caretaker caretaker = new Caretaker();
-      Originator originator = new Originator();
+      TextManager textManager = new TextManager();
 
       while (true)
       {
@@ -33,7 +32,7 @@ namespace xml280325
 
         switch (menuChoice)
         {
-          case "0": 
+          case "0":
             return;
 
           case "1":
@@ -48,42 +47,41 @@ namespace xml280325
           case "2":
             Console.Write("Путь к файлу: ");
             currentFilePath = Console.ReadLine();
-            if (File.Exists(currentFilePath))
+            try
             {
-              string content = File.ReadAllText(currentFilePath);
-              Console.WriteLine(content);
-              originator.State = content;
+              textManager.LoadFromFile(currentFilePath);
+              Console.WriteLine(textManager.GetCurrentText());
             }
-            else
+            catch (FileNotFoundException)
             {
               Console.WriteLine("Файл не найден");
             }
             break;
 
-          case "3": 
+          case "3":
             if (string.IsNullOrEmpty(currentFilePath))
             {
               Console.WriteLine("Сначала откройте файл (пункт 2)");
               break;
             }
-            caretaker.Memento = originator.CreateMemento();
+            textManager.SaveState();
             Console.Write("Текст для записи: ");
             string text = Console.ReadLine();
             File.AppendAllText(currentFilePath, text + Environment.NewLine);
-            originator.State = File.ReadAllText(currentFilePath);
+            textManager.LoadFromFile(currentFilePath);
             Console.WriteLine("Изменения сохранены");
             break;
 
           case "4":
-            if (caretaker.Memento != null && File.Exists(currentFilePath))
+            try
             {
-              originator.SetMemento(caretaker.Memento);
-              File.WriteAllText(currentFilePath, originator.State);
+              textManager.RestoreState();
+              textManager.SaveToFile(currentFilePath);
               Console.WriteLine("Откат выполнен");
             }
-            else
+            catch (InvalidOperationException ex)
             {
-              Console.WriteLine("Нет состояния для отката");
+              Console.WriteLine(ex.Message);
             }
             break;
 
@@ -93,13 +91,13 @@ namespace xml280325
               Console.WriteLine("Сначала откройте файл (пункт 2)");
               break;
             }
-            var fileSer = new FileSer(currentFilePath, File.ReadAllText(currentFilePath));
+            var fileSer = new FileSer(currentFilePath, textManager.GetCurrentText());
             byte[] binaryData = fileSer.SerializeBinary();
             File.WriteAllBytes(currentFilePath + ".bin", binaryData);
             Console.WriteLine("Файл сохранён в бинарном формате");
             break;
 
-          case "6": 
+          case "6":
             Console.Write("Путь к .bin файлу: ");
             string binPath = Console.ReadLine();
             if (File.Exists(binPath))
@@ -114,13 +112,13 @@ namespace xml280325
             }
             break;
 
-          case "7": 
+          case "7":
             if (string.IsNullOrEmpty(currentFilePath))
             {
               Console.WriteLine("Сначала откройте файл (пункт 2)");
               break;
             }
-            var fileSerXml = new FileSer(currentFilePath, File.ReadAllText(currentFilePath));
+            var fileSerXml = new FileSer(currentFilePath, textManager.GetCurrentText());
             using (var fs = File.Create(currentFilePath + ".xml"))
             {
               fileSerXml.SerializeXML(fs);
@@ -145,8 +143,8 @@ namespace xml280325
             }
             break;
 
-          default: 
-            Console.WriteLine("Неверный ввод"); 
+          default:
+            Console.WriteLine("Неверный ввод");
             break;
         }
       }

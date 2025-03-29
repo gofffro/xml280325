@@ -14,7 +14,21 @@ namespace xml280325
 
   public class TextHistory
   {
-    public TextMemento Memento { get; set; }
+    private TextMemento _memento;
+
+    public void SaveMemento(TextMemento memento)
+    {
+      _memento = memento;
+    }
+
+    public TextMemento GetMemento()
+    {
+      if (_memento != null)
+      {
+        return _memento;
+      }
+      throw new InvalidOperationException("Нет состояний для отката");
+    }
   }
 
   public class TextEditor

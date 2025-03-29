@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text.Json;
 using System.Xml.Serialization;
 
 namespace xml280325
@@ -27,12 +26,44 @@ namespace xml280325
 
     public byte[] SerializeBinary()
     {
-      return JsonSerializer.SerializeToUtf8Bytes(this);
+      using var memoryStream = new MemoryStream();
+      using var binaryWriter = new BinaryWriter(memoryStream);
+
+      if (FileName == null)
+      {
+        binaryWriter.Write(string.Empty);
+      }
+      else
+      {
+        binaryWriter.Write(FileName);
+      }
+
+      if (Content == null)
+      {
+        binaryWriter.Write(string.Empty);
+      }
+      else
+      {
+        binaryWriter.Write(Content);
+      }
+
+      return memoryStream.ToArray();
     }
 
     public static FileSer DeserializeBinary(byte[] data)
     {
-      return JsonSerializer.Deserialize<FileSer>(data);
+      using var memoryStream = new MemoryStream(data);
+      using var binaryReader = new BinaryReader(memoryStream);
+
+      var fileName = binaryReader.ReadString();
+      var content = string.Empty; 
+
+      if (memoryStream.Position < memoryStream.Length)
+      {
+        content = binaryReader.ReadString();
+      }
+
+      return new FileSer(fileName, content);
     }
 
     public void SerializeXML(FileStream fs)

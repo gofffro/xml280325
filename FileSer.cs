@@ -36,7 +36,16 @@ namespace xml280325
       else
       {
         binaryWriter.Write(FileName);
-      } 
+      }
+
+      if (Content == null)
+      {
+        binaryWriter.Write(string.Empty);
+      }
+      else
+      {
+        binaryWriter.Write(Content);
+      }
 
       return memoryStream.ToArray();
     }
@@ -47,7 +56,12 @@ namespace xml280325
       using var binaryReader = new BinaryReader(memoryStream);
 
       var fileName = binaryReader.ReadString();
-      var content = binaryReader.ReadString();
+      var content = string.Empty; 
+
+      if (memoryStream.Position < memoryStream.Length)
+      {
+        content = binaryReader.ReadString();
+      }
 
       return new FileSer(fileName, content);
     }

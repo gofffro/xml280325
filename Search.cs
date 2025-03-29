@@ -2,23 +2,24 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace xml280325
 {
   public class Search
   {
     public string DirectoryPath { get; set; }
-    public string Keyword { get; set; }
+    public Dictionary<string, List<string>> Index { get; private set; }
 
-    public Search(string keyword, string directoryPath)
+    public Search(string directoryPath)
     {
       DirectoryPath = directoryPath;
-      Keyword = keyword;
+      Index = new Dictionary<string, List<string>>();
     }
 
-    public List<string> FindFilesWithKeyword()
+    public void IndexWordsFiles()
     {
-      List<string> resultFiles = new List<string>();
+      Index.Clear();
 
       try
       {
@@ -29,31 +30,53 @@ namespace xml280325
           try
           {
             string fileContent = File.ReadAllText(file, Encoding.Default);
+            string[] words = fileContent.Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (fileContent.IndexOf(Keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+            foreach (string word in words)
             {
-              resultFiles.Add(file);
+              if (!Index.ContainsKey(word))
+              {
+                Index[word] = new List<string>();
+              }
+
+              if (!Index[word].Contains(file))
+              {
+                Index[word].Add(file);
+              }
             }
           }
           catch (Exception ex)
           {
-            Console.WriteLine($"Ошибка при чтении файла {file}: {ex.Message}");
+            Console.WriteLine($"Ошибка при индексации файла {file}: {ex.Message}");
           }
         }
       }
       catch (Exception ex)
       {
-        Console.WriteLine($"Ошибка при поиске файлов в директории {DirectoryPath}: {ex.Message}");
+        Console.WriteLine($"Ошибка при доступе к директории {DirectoryPath}: {ex.Message}");
       }
-
-      return resultFiles;
     }
 
-    public void Result()
+    public List<string> FindFilesWithKeyword(string keyword)
     {
-      Console.WriteLine($"Поиск файлов, содержащих ключевое слово '{Keyword}' в директории '{DirectoryPath}':");
+      if (Index.Count == 0)
+      {
+        IndexWordsFiles();
+      }
 
-      List<string> foundFiles = FindFilesWithKeyword();
+      if (Index.TryGetValue(keyword, out List<string> files))
+      {
+        return files;
+      }
+
+      return new List<string>();
+    }
+
+    public void Result(string keyword)
+    {
+      Console.WriteLine($"Поиск файлов, содержащих ключевое слово '{keyword}' в директории '{DirectoryPath}':");
+
+      List<string> foundFiles = FindFilesWithKeyword(keyword);
 
       if (foundFiles.Count > 0)
       {

@@ -37,7 +37,7 @@ namespace xml280325
             return;
 
           case "1":
-            PerformSearch();
+            PerformSearch(ref search);
             break;
 
           case "2":
@@ -80,14 +80,22 @@ namespace xml280325
       Console.WriteLine("Выход из программы.");
     }
 
-    private static void PerformSearch()
+    private static void PerformSearch(ref Search search)
     {
       Console.Write("Директория: ");
       string dir = Console.ReadLine();
+
+      if (search == null || search.DirectoryPath != dir)
+      {
+        search = new Search(dir);
+        Console.WriteLine("Индексация файлов");
+        search.IndexWordsFiles();
+      }
+
       Console.Write("Ключевое слово: ");
       string keyword = Console.ReadLine();
-      var search = new Search(keyword, dir);
-      search.Result();
+
+      search.Result(keyword);
     }
 
     private static void ReadFile(ref string currentFilePath, TextManager textManager)
@@ -155,7 +163,7 @@ namespace xml280325
       {
         byte[] data = File.ReadAllBytes(binPath);
         FileSer loadedFile = FileSer.DeserializeBinary(data);
-        Console.WriteLine($"Загружен файл: {loadedFile.FileName}\n{loadedFile.Content}");
+        loadedFile.Print();
       }
       else
       {
@@ -187,7 +195,7 @@ namespace xml280325
         using (var fs = File.OpenRead(xmlPath))
         {
           FileSer loadedFile = FileSer.DeserializeXML(fs);
-          Console.WriteLine($"Загружен файл: {loadedFile.FileName}\n{loadedFile.Content}");
+          loadedFile.Print();
         }
       }
       else

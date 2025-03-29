@@ -24,11 +24,6 @@ namespace xml280325
       return _editor.State;
     }
 
-    public void UpdateText(string newText)
-    {
-      _editor.State = newText;
-    }
-
     public void SaveToFile(string filePath)
     {
       File.WriteAllText(filePath, _editor.State);

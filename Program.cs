@@ -33,120 +33,166 @@ namespace xml280325
         switch (menuChoice)
         {
           case "0":
+            ExitProgram();
             return;
 
           case "1":
-            Console.Write("Директория: ");
-            string dir = Console.ReadLine();
-            Console.Write("Ключевое слово: ");
-            string keyword = Console.ReadLine();
-            search = new Search(keyword, dir);
-            search.Result();
+            PerformSearch();
             break;
 
           case "2":
-            Console.Write("Путь к файлу: ");
-            currentFilePath = Console.ReadLine();
-            try
-            {
-              textManager.LoadFromFile(currentFilePath);
-              Console.WriteLine(textManager.GetCurrentText());
-            }
-            catch (FileNotFoundException)
-            {
-              Console.WriteLine("Файл не найден");
-            }
+            ReadFile(ref currentFilePath, textManager);
             break;
 
           case "3":
-            if (string.IsNullOrEmpty(currentFilePath))
-            {
-              Console.WriteLine("Сначала откройте файл (пункт 2)");
-              break;
-            }
-            textManager.SaveState();
-            Console.Write("Текст для записи: ");
-            string text = Console.ReadLine();
-            File.AppendAllText(currentFilePath, text + Environment.NewLine);
-            textManager.LoadFromFile(currentFilePath);
-            Console.WriteLine("Изменения сохранены");
+            WriteToFile(currentFilePath, textManager);
             break;
 
           case "4":
-            try
-            {
-              textManager.RestoreState();
-              textManager.SaveToFile(currentFilePath);
-              Console.WriteLine("Откат выполнен");
-            }
-            catch (InvalidOperationException ex)
-            {
-              Console.WriteLine(ex.Message);
-            }
+            RollbackChanges(textManager, currentFilePath);
             break;
 
           case "5":
-            if (string.IsNullOrEmpty(currentFilePath))
-            {
-              Console.WriteLine("Сначала откройте файл (пункт 2)");
-              break;
-            }
-            var fileSer = new FileSer(currentFilePath, textManager.GetCurrentText());
-            byte[] binaryData = fileSer.SerializeBinary();
-            File.WriteAllBytes(currentFilePath + ".bin", binaryData);
-            Console.WriteLine("Файл сохранён в бинарном формате");
+            SaveBinaryFile(currentFilePath, textManager);
             break;
 
           case "6":
-            Console.Write("Путь к .bin файлу: ");
-            string binPath = Console.ReadLine();
-            if (File.Exists(binPath))
-            {
-              byte[] data = File.ReadAllBytes(binPath);
-              FileSer loadedFile = FileSer.DeserializeBinary(data);
-              Console.WriteLine($"Загружен файл: {loadedFile.FileName}\n{loadedFile.Content}");
-            }
-            else
-            {
-              Console.WriteLine("Файл не найден");
-            }
+            LoadBinaryFile();
             break;
 
           case "7":
-            if (string.IsNullOrEmpty(currentFilePath))
-            {
-              Console.WriteLine("Сначала откройте файл (пункт 2)");
-              break;
-            }
-            var fileSerXml = new FileSer(currentFilePath, textManager.GetCurrentText());
-            using (var fs = File.Create(currentFilePath + ".xml"))
-            {
-              fileSerXml.SerializeXML(fs);
-            }
-            Console.WriteLine("Файл сохранён в XML");
+            SaveXmlFile(currentFilePath, textManager);
             break;
 
           case "8":
-            Console.Write("Путь к .xml файлу: ");
-            string xmlPath = Console.ReadLine();
-            if (File.Exists(xmlPath))
-            {
-              using (var fs = File.OpenRead(xmlPath))
-              {
-                FileSer loadedFile = FileSer.DeserializeXML(fs);
-                Console.WriteLine($"Загружен файл: {loadedFile.FileName}\n{loadedFile.Content}");
-              }
-            }
-            else
-            {
-              Console.WriteLine("Файл не найден");
-            }
+            LoadXmlFile();
             break;
 
           default:
             Console.WriteLine("Неверный ввод");
             break;
         }
+      }
+    }
+
+    private static void ExitProgram()
+    {
+      Console.WriteLine("Выход из программы.");
+    }
+
+    private static void PerformSearch()
+    {
+      Console.Write("Директория: ");
+      string dir = Console.ReadLine();
+      Console.Write("Ключевое слово: ");
+      string keyword = Console.ReadLine();
+      var search = new Search(keyword, dir);
+      search.Result();
+    }
+
+    private static void ReadFile(ref string currentFilePath, TextManager textManager)
+    {
+      Console.Write("Путь к файлу: ");
+      currentFilePath = Console.ReadLine();
+      try
+      {
+        textManager.LoadFromFile(currentFilePath);
+        Console.WriteLine(textManager.GetCurrentText());
+      }
+      catch (FileNotFoundException)
+      {
+        Console.WriteLine("Файл не найден");
+      }
+    }
+
+    private static void WriteToFile(string currentFilePath, TextManager textManager)
+    {
+      if (string.IsNullOrEmpty(currentFilePath))
+      {
+        Console.WriteLine("Сначала откройте файл (пункт 2)");
+        return;
+      }
+      textManager.SaveState();
+      Console.Write("Текст для записи: ");
+      string text = Console.ReadLine();
+      File.AppendAllText(currentFilePath, text + Environment.NewLine);
+      textManager.LoadFromFile(currentFilePath);
+      Console.WriteLine("Изменения сохранены");
+    }
+
+    private static void RollbackChanges(TextManager textManager, string currentFilePath)
+    {
+      try
+      {
+        textManager.RestoreState();
+        textManager.SaveToFile(currentFilePath);
+        Console.WriteLine("Откат выполнен");
+      }
+      catch (InvalidOperationException ex)
+      {
+        Console.WriteLine(ex.Message);
+      }
+    }
+
+    private static void SaveBinaryFile(string currentFilePath, TextManager textManager)
+    {
+      if (string.IsNullOrEmpty(currentFilePath))
+      {
+        Console.WriteLine("Сначала откройте файл (пункт 2)");
+        return;
+      }
+      var fileSer = new FileSer(currentFilePath, textManager.GetCurrentText());
+      byte[] binaryData = fileSer.SerializeBinary();
+      File.WriteAllBytes(currentFilePath + ".bin", binaryData);
+      Console.WriteLine("Файл сохранён в бинарном формате");
+    }
+
+    private static void LoadBinaryFile()
+    {
+      Console.Write("Путь к .bin файлу: ");
+      string binPath = Console.ReadLine();
+      if (File.Exists(binPath))
+      {
+        byte[] data = File.ReadAllBytes(binPath);
+        FileSer loadedFile = FileSer.DeserializeBinary(data);
+        Console.WriteLine($"Загружен файл: {loadedFile.FileName}\n{loadedFile.Content}");
+      }
+      else
+      {
+        Console.WriteLine("Файл не найден");
+      }
+    }
+
+    private static void SaveXmlFile(string currentFilePath, TextManager textManager)
+    {
+      if (string.IsNullOrEmpty(currentFilePath))
+      {
+        Console.WriteLine("Сначала откройте файл (пункт 2)");
+        return;
+      }
+      var fileSerXml = new FileSer(currentFilePath, textManager.GetCurrentText());
+      using (var fs = File.Create(currentFilePath + ".xml"))
+      {
+        fileSerXml.SerializeXML(fs);
+      }
+      Console.WriteLine("Файл сохранён в XML");
+    }
+
+    private static void LoadXmlFile()
+    {
+      Console.Write("Путь к .xml файлу: ");
+      string xmlPath = Console.ReadLine();
+      if (File.Exists(xmlPath))
+      {
+        using (var fs = File.OpenRead(xmlPath))
+        {
+          FileSer loadedFile = FileSer.DeserializeXML(fs);
+          Console.WriteLine($"Загружен файл: {loadedFile.FileName}\n{loadedFile.Content}");
+        }
+      }
+      else
+      {
+        Console.WriteLine("Файл не найден");
       }
     }
   }

@@ -20,7 +20,6 @@ namespace xml280325
     public void IndexWordsFiles()
     {
       Index.Clear();
-
       try
       {
         string[] allFiles = Directory.GetFiles(DirectoryPath, "*.*", SearchOption.AllDirectories);

@@ -120,6 +120,7 @@ namespace xml280325
         Console.WriteLine("Сначала откройте файл (пункт 2)");
         return;
       }
+
       textManager.SaveState();
       Console.Write("Текст для записи: ");
       string text = Console.ReadLine();
@@ -149,6 +150,7 @@ namespace xml280325
         Console.WriteLine("Сначала откройте файл (пункт 2)");
         return;
       }
+
       var fileSer = new FileSer(currentFilePath, textManager.GetCurrentText());
       byte[] binaryData = fileSer.SerializeBinary();
       File.WriteAllBytes(currentFilePath + ".bin", binaryData);
@@ -178,6 +180,7 @@ namespace xml280325
         Console.WriteLine("Сначала откройте файл (пункт 2)");
         return;
       }
+
       var fileSerXml = new FileSer(currentFilePath, textManager.GetCurrentText());
       using (var fs = File.Create(currentFilePath + ".xml"))
       {
